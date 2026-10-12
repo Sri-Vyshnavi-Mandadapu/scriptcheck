@@ -71,7 +71,9 @@ export function composeReview(parsed,input,rules,model){
 export async function review(input,{apiKey,model='gpt-5.4',baseURL='https://api.openai.com/v1',fetchImpl=fetch}={}){
  const rules=analyze(input.medicines,input.context);
  if(!apiKey)return fallback('The site owner has not connected the AI service yet.',rules);
- const content=[{type:'input_text',text:JSON.stringify({prescription_notes:input.text,medicines:input.medicines,patient_context:input.context,independent_rule_findings:rules.findings})}];
+ const schedules={'1':'once a day','2':'twice a day','3':'three times a day','4':'four times a day',weekly:'once a week',needed:'only when needed; maximum daily frequency unknown',other:'other or unknown','':'not provided'};
+ const modelMedicines=input.medicines.map(m=>({...m,schedule:schedules[m.schedule]||'unrecognized schedule',strength_meaning:`${m.strength} ${m.unit} per ${m.form}`,quantity_meaning:`${m.quantity} ${m.form}(s) per dose`}));
+ const content=[{type:'input_text',text:JSON.stringify({prescription_notes:input.text,medicines:modelMedicines,patient_context:input.context,independent_rule_findings:rules.findings})}];
  if(input.document)content.push(input.document.type==='application/pdf'?{type:'input_file',filename:'prescription.pdf',file_data:input.document.data}:{type:'input_image',image_url:input.document.data,detail:'high'});
  try{
   const response=await fetchImpl(`${baseURL.replace(/\/$/,'')}/responses`,{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},signal:AbortSignal.timeout(45000),body:JSON.stringify({model,store:false,reasoning:{effort:'medium'},max_output_tokens:6000,instructions,input:[{role:'user',content}],text:{format:{type:'json_schema',name:'prescription_review',strict:true,schema}}})});
