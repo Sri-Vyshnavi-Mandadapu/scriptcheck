@@ -68,13 +68,13 @@ export function composeReview(parsed,input,rules,model){
  const uncertain=parsed.assessment==='unable_to_assess'||reasons.length>0;
  return{status:uncertain?'pharmacist_required':parsed.findings.length||rules.findings.length?'potential_concerns':'no_concern_identified',aiCompleted:true,summary:parsed.summary,reasons:[...new Set(reasons)],findings:parsed.findings,medicinesRead:parsed.medicines_read,pharmacistQuestions:[...new Set([...parsed.pharmacist_questions,...parsed.findings.map(f=>f.question_for_pharmacist),'Please verify this preliminary review against the original prescription and a current medicine reference.'])],reviewRequired:true,model,promptVersion:PROMPT_VERSION,rules,createdAt:new Date().toISOString()};
 }
-export async function review(input,{apiKey,model='gpt-5.4',fetchImpl=fetch}={}){
+export async function review(input,{apiKey,model='gpt-5.4',baseURL='https://api.openai.com/v1',fetchImpl=fetch}={}){
  const rules=analyze(input.medicines,input.context);
  if(!apiKey)return fallback('The site owner has not connected the AI service yet.',rules);
  const content=[{type:'input_text',text:JSON.stringify({prescription_notes:input.text,medicines:input.medicines,patient_context:input.context,independent_rule_findings:rules.findings})}];
  if(input.document)content.push(input.document.type==='application/pdf'?{type:'input_file',filename:'prescription.pdf',file_data:input.document.data}:{type:'input_image',image_url:input.document.data,detail:'high'});
  try{
-  const response=await fetchImpl('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},signal:AbortSignal.timeout(45000),body:JSON.stringify({model,store:false,reasoning:{effort:'medium'},max_output_tokens:6000,instructions,input:[{role:'user',content}],text:{format:{type:'json_schema',name:'prescription_review',strict:true,schema}}})});
+  const response=await fetchImpl(`${baseURL.replace(/\/$/,'')}/responses`,{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},signal:AbortSignal.timeout(45000),body:JSON.stringify({model,store:false,reasoning:{effort:'medium'},max_output_tokens:6000,instructions,input:[{role:'user',content}],text:{format:{type:'json_schema',name:'prescription_review',strict:true,schema}}})});
   if(!response.ok)return fallback(response.status===429?'The AI service is busy or its usage limit has been reached.':'The AI service is unavailable. A pharmacist can review the prescription instead.',rules);
   const data=await response.json();
   if(data.status!=='completed')return fallback('The model did not finish its review.',rules);

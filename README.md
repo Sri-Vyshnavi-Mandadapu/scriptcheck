@@ -4,7 +4,7 @@ A responsive prescription-review **educational prototype**, inspired by the supp
 
 Public address: https://scriptcheck-rx.netlify.app (`scriptcheck.netlify.app` was unavailable).
 
-Local rule checking needs no API key. Cloud AI requires a server-side `OPENAI_API_KEY` and provider usage credits. The default model is GPT-5.4, not a clinically validated ScriptCheck-specific model. See [AI setup and boundaries](docs/AI-DEPLOYMENT.md).
+Local rule checking needs no API key. Cloud AI uses Netlify AI Gateway's automatically supplied server credentials and base URL when available, or an explicitly configured server-side OpenAI key. AI usage consumes hosting/provider credits. The default model is GPT-5.4, not a clinically validated ScriptCheck-specific model. See [AI setup and boundaries](docs/AI-DEPLOYMENT.md).
 
 ## Run
 

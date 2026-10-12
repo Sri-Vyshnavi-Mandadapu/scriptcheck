@@ -4,8 +4,8 @@ The Netlify endpoint `/.netlify/functions/ai-review` calls OpenAI Responses with
 
 ## Activate
 
-1. In Netlify's ScriptCheck environment settings, add `OPENAI_API_KEY` with Functions scope. Never put the key in source, browser storage, chat, or netlify.toml.
-2. Configure provider project usage/billing limits. Hosting and model inference are separate costs; unlimited free AI is not promised.
+1. On eligible Netlify credit-based plans, AI Gateway automatically provides `OPENAI_API_KEY` and `OPENAI_BASE_URL`; this app honors both. No separate provider key is required. Alternatively, configure a provider key and its base URL using Functions-scoped Netlify environment settings. Never put keys in source, browser storage, chat, or netlify.toml.
+2. Review account AI usage/credit limits. Gateway inference consumes Netlify credits; an independently configured provider key uses that provider's billing. Unlimited free inference is not promised.
 3. Redeploy to apply environment changes: `npm exec --package=netlify-cli -- netlify deploy --prod --no-build --dir=dist`.
 4. Check the readiness endpoint and test with synthetic prescriptions.
 

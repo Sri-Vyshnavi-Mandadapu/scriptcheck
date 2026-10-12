@@ -11,6 +11,6 @@ export default async function handler(request){
  let body;
  try{const raw=await request.text();if(raw.length>4500000)return json(fallback('File too large.'),413);body=validateInput(JSON.parse(raw));}
  catch(error){return json(fallback(error instanceof SyntaxError?'Invalid request.':error.message),400);}
- return json(await review(body,{apiKey:env.OPENAI_API_KEY,model:env.OPENAI_MODEL||'gpt-5.4'}));
+ return json(await review(body,{apiKey:env.OPENAI_API_KEY,model:env.OPENAI_MODEL||'gpt-5.4',baseURL:env.OPENAI_BASE_URL||'https://api.openai.com/v1'}));
 }
 export const config={rateLimit:{windowLimit:6,windowSize:60,aggregateBy:['ip','domain']}};
