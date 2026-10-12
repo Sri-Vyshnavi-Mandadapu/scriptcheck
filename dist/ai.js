@@ -27,6 +27,7 @@ $('ai-analyze').onclick=async()=>{
  try{
   let document=null;if(input.file&&input.file.type!=='text/plain')document={type:input.file.type,data:await asDataUrl(input.file)};
   if(run!==revision)return;
+  if(input.file)$('file-info').textContent='This prescription is being shared for AI review with your consent. The preview remains on this device.';
   const response=await fetch('/.netlify/functions/ai-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({consent:true,text:input.text,medicines:input.medicines,context:input.context,document}),signal:activeController.signal});
   const result=response.headers.get('content-type')?.includes('application/json')?await response.json():fallback('The review service did not respond.');
   if(!response.ok&&!result.summary)throw new Error();
