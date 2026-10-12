@@ -3,7 +3,7 @@ export const sources={warfarin:'https://www.nhs.uk/medicines/warfarin/',methotre
 export const catalog=['paracetamol','ibuprofen','aspirin','naproxen','warfarin','methotrexate','trimethoprim','co-trimoxazole','ramipril','spironolactone'];
 export const normalize=s=>String(s||'').trim().toLowerCase().replace(/^acetaminophen$/,'paracetamol');
 export function analyze(medicines,c={}){
- const findings=[],gaps=['This small rule set cannot check every interaction or confirm that a prescription is safe.','No trained AI model, laboratory interpretation, pregnancy dosing, or complete dose database is connected.'];
+ const findings=[],gaps=['This small rule set cannot check every interaction or confirm that a prescription is safe.','These local rules do not include AI, laboratory interpretation, pregnancy dosing, or a complete dose database. Optional AI review is shown separately.'];
  const active=medicines.filter(m=>m.status==='current'),names=active.map(m=>normalize(m.name)),nsaids=['ibuprofen','aspirin','naproxen'];
  const add=(id,level,title,explanation,trigger,source)=>findings.push({id,level,title,explanation,trigger,source,action:'Ask your pharmacist or prescribing doctor to review this. Do not change your treatment on your own.'});
  if(!c.age||Number(c.age)<18) gaps.push('Adult age is missing or the person is under 18. Child-specific checks are not supported.');

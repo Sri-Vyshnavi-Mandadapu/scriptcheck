@@ -1,6 +1,10 @@
 # ScriptCheck
 
-A responsive prescription-review **educational prototype**, inspired by the supplied ScriptCheck Industry Product Blueprint. Floating CSS 3D medicine visuals, browser-local prescription intake, plain-language findings and downloadable reports. No account, backend, patient database, API key or paid service required.
+A responsive prescription-review **educational prototype**, inspired by the supplied ScriptCheck Industry Product Blueprint. Floating CSS 3D visuals, optional multimodal AI review, independent rule checks, plain-language findings, and pharmacist handoff reports.
+
+Public address: https://scriptcheck-rx.netlify.app (`scriptcheck.netlify.app` was unavailable).
+
+Local rule checking needs no API key. Cloud AI requires a server-side `OPENAI_API_KEY` and provider usage credits. The default model is GPT-5.4, not a clinically validated ScriptCheck-specific model. See [AI setup and boundaries](docs/AI-DEPLOYMENT.md).
 
 ## Run
 
@@ -11,9 +15,13 @@ npm test
 npm start
 ```
 
-Open http://localhost:4173. Deploy `dist/` to Netlify (configuration included), GitHub Pages, or any static host. The Sites manifest supports the connected Sites deployment.
+Open http://localhost:4173 for the local-rule frontend. Use Netlify Dev for the AI endpoint. Deploy through Netlify CLI with the included function configuration; a static-only host cannot execute the AI backend. The retained Sites manifest identifies the original static deployment.
 
 ## What works
+
+- Optional AI review of image/PDF/text/entered medicine data, after explicit sharing consent.
+- Uncertainty, incomplete inputs, refusal, timeout, quota error and missing configuration route to a pharmacist-review handoff. The app does not automatically contact a pharmacist.
+- Server-side structured output validation, selected independent safeguards, size limits, and request rate limiting.
 
 - JPG/PNG/WEBP preview, PDF preview and manual transcription, plain-text import.
 - Optional English printed-image OCR using Tesseract.js 5.1.1 in the browser. It requires external software/model downloads and can fail offline; manual entry remains available. Handwriting is not validated.
@@ -24,14 +32,14 @@ Open http://localhost:4173. Deploy `dist/` to Netlify (configuration included), 
 
 ## Clinical boundary
 
-**Not clinically validated and not for treatment decisions.** It can miss serious interactions. No trained AI model or comprehensive licensed knowledge service is connected. Never infer safety from a result without findings. Rules use linked NHS/FDA references but have not been approved by a clinical owner. Sources are in `dist/engine.js`; rule version is included in reports. No accuracy or regulatory claims are made.
+**Not clinically validated and not for treatment decisions.** It can miss serious interactions. A general-purpose AI integration is available when configured; there is no comprehensive licensed knowledge service or independently validated patient-risk model. Never infer safety from a result without findings. Rules use linked NHS/FDA references but have not been approved by a clinical owner. Sources are in `dist/engine.js`; rule and prompt/model versions accompany their reports. No accuracy or regulatory claims are made.
 
 The blueprint's complete product requires clinical partnership, a validated learned model, licensed comprehensive evidence, secure professional authentication/authorization, longitudinal records, expert decisions and notifications, and regulatory review. Those are not simulated here. See `docs/ROADMAP.md`.
 
 ## Privacy
 
-Prescription content stays in page memory; no localStorage, analytics, health API calls, server storage or care-team messaging. Refresh/close clears it. Hosting providers and Google Fonts/jsDelivr/Tesseract language-model hosts receive ordinary network metadata. Optional OCR operates on-device. Downloaded/printed reports contain health details and must be handled privately. Use synthetic data for demonstrations.
+Local checks and optional OCR operate on-device. With explicit consent, AI review sends the chosen prescription and entered context through Netlify to OpenAI. No patient database, localStorage, clinical-content logging or care-team messaging. API requests use `store:false`; provider abuse-monitoring retention can still apply. Refresh/close clears browser memory. Hosting and software providers receive ordinary network metadata. Keep downloaded/printed reports private. Use synthetic data for demonstrations.
 
 ## Verification
 
-`node --test tests/*.test.js` tests the rule engine, including unit conversion, unknown data, excluded medicine states, all configured pairs, dose gating and absence of safety clearance. Passing these tests proves neither clinical effectiveness nor comprehensive coverage.
+`node --test tests/*.test.js` tests the rule engine and mocked AI integration, including unit conversion, unknown data, independent warning preservation, consent, refusals, timeouts, schema validation and absence of safety clearance. Passing these tests proves neither clinical effectiveness nor comprehensive coverage. Live provider tests require a configured API key.
